@@ -1,0 +1,30 @@
+body {
+  background-image: url('./assets/images/weather-background.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.weather-box {
+  border: 3px solid white;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 90%; /* 최대 너비 설정 */
+  width: 400px; /* 기본 너비 설정 */
+  margin: 0 10px; /* 좌우 여백 추가 */
+}
+
+/* 작은 화면을 위한 미디어 쿼리 */
+@media (max-width: 768px) {
+  .weather-box {
+    width: 95%; /* 작은 화면에서 더 넓게 */
+    padding: 15px; /* 패딩 줄이기 */
+  }
+}
