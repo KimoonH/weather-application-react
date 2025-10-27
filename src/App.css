@@ -39,10 +39,16 @@ body {
   font-weight: bold;
 }
 
-/* 작은 화면을 위한 미디어 쿼리 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
 @media (max-width: 768px) {
   .weather-box {
-    width: 95%; /* 작은 화면에서 더 넓게 */
-    padding: 15px; /* 패딩 줄이기 */
+    width: 95%; 
+    padding: 15px; 
   }
 }

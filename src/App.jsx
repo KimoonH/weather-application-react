@@ -26,9 +26,28 @@ function App() {
       let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=726d97ec75de043571f7cdbe861a3956&units=metric`;
       let response = await fetch(url);
       let data = await response.json();
+
+      // OpenWeatherMap API는 에러 시 cod 필드에 에러 코드를 반환합니다
+      if (data.cod && data.cod !== 200) {
+        throw new Error(data.message || '날씨 정보를 가져올 수 없습니다.');
+      }
+
+      // HTTP 상태 코드 체크
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
       setWeather(data);
     } catch (err) {
-      setError('현재 위치의 날씨 정보를 가져올 수 없습니다.');
+      if (err.message.includes('401')) {
+        setError('API 키가 유효하지 않습니다.');
+      } else if (err.message.includes('404')) {
+        setError('해당 위치의 날씨 정보를 찾을 수 없습니다.');
+      } else if (err.message.includes('Failed to fetch')) {
+        setError('네트워크 연결을 확인해주세요.');
+      } else {
+        setError(err.message || '현재 위치의 날씨 정보를 가져올 수 없습니다.');
+      }
     } finally {
       setLoading(false);
     }
@@ -41,20 +60,45 @@ function App() {
       let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=726d97ec75de043571f7cdbe861a3956&units=metric`;
       let response = await fetch(url);
       let data = await response.json();
+
+      // OpenWeatherMap API는 에러 시 cod 필드에 에러 코드를 반환합니다
+      if (data.cod && data.cod !== 200) {
+        throw new Error(data.message || '날씨 정보를 가져올 수 없습니다.');
+      }
+
+      // HTTP 상태 코드 체크
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
       setWeather(data);
     } catch (err) {
-      setError(`${city}의 날씨 정보를 가져올 수 없습니다.`);
+      if (err.message.includes('401')) {
+        setError('API 키가 유효하지 않습니다.');
+      } else if (err.message.includes('404') || err.message.includes('city not found')) {
+        setError(`'${city}' 도시를 찾을 수 없습니다. 영어로 정확한 도시명을 입력해주세요.`);
+      } else if (err.message.includes('Failed to fetch')) {
+        setError('네트워크 연결을 확인해주세요.');
+      } else {
+        setError(err.message || `${city}의 날씨 정보를 가져올 수 없습니다.`);
+      }
     } finally {
       setLoading(false);
     }
   }, [city]);
 
   const getCurrentLocation = useCallback(() => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      let lat = position.coords.latitude
-      let lon = position.coords.longitude
-      getWeatherByCurrentLocation(lat, lon);
-    });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        let lat = position.coords.latitude
+        let lon = position.coords.longitude
+        getWeatherByCurrentLocation(lat, lon);
+      },
+      (error) => {
+        setLoading(false);
+        setError('위치 정보 접근이 거부되었습니다. 위치 권한을 허용하거나 도시를 선택해주세요.');
+      }
+    );
   }, [getWeatherByCurrentLocation]);
 
   useEffect(() => {
@@ -68,11 +112,13 @@ function App() {
   return (
     <div>
       {loading ? (
-        <ClipLoader
-          color="#c27862"
-          loading={loading}
-          size={100}
-        />
+        <div className="loading-container">
+          <ClipLoader
+            color="#c27862"
+            loading={loading}
+            size={100}
+          />
+        </div>
       ) : error ? (
         <>
           <div className="error-message">{error}</div>

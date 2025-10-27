@@ -2,6 +2,14 @@ import React from 'react'
 import { Button } from "react-bootstrap"
 
 const WeatherButton = ({ cities, setCity, city }) => {
+  // 도시 이름의 각 단어 첫 글자를 대문자로 변환
+  const capitalizeCity = (cityName) => {
+    return cityName
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   return (
     <div className="weather-button-container">
       <Button
@@ -14,7 +22,7 @@ const WeatherButton = ({ cities, setCity, city }) => {
           variant={city === item ? "warning" : "outline-warning"}
           key={index}
           onClick={() => setCity(item)}>
-          {item}
+          {capitalizeCity(item)}
         </Button>
       ))}
     </div>
